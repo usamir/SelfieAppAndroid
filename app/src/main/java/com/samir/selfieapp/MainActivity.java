@@ -1,6 +1,7 @@
 package com.samir.selfieapp;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "SelfieApp";
+    private static final String TAG = "Camera";
 
 
     @Override
@@ -54,3 +55,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+

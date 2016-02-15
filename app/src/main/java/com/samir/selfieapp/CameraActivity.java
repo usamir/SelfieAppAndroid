@@ -1,5 +1,7 @@
 package com.samir.selfieapp;
 
+import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -21,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivity extends Activity {
     private static final int PREVIEW_PAUSE = 2000;
     private static final String TAG = "SelfieApp";
     public static final int MEDIA_TYPE_IMAGE = 1;
