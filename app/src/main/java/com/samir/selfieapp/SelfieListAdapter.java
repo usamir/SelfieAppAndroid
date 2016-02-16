@@ -43,6 +43,7 @@ public class SelfieListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         View newView = convertView;
         ViewHolder holder;
 
@@ -50,9 +51,9 @@ public class SelfieListAdapter extends BaseAdapter {
 
         if (null == convertView) {
             holder = new ViewHolder();
-            //newView = inflater.inflate(R.layout.item_view, null);
-            //holder.picture = (ImageView) newView.findViewById(R.id.picture);
-            //holder.date = (TextView) newView.findViewById(R.id.date);
+            newView = inflater.inflate(R.layout.content_main, null);
+            holder.picture = (ImageView) newView.findViewById(R.id.picture);
+            holder.date = (TextView) newView.findViewById(R.id.date);
             newView.setTag(holder);
 
         } else {
@@ -81,6 +82,7 @@ public class SelfieListAdapter extends BaseAdapter {
         return list;
     }
 
+    /*
     public void removeAllViews() {
         list.clear();
         File storageDir = Environment
@@ -92,4 +94,5 @@ public class SelfieListAdapter extends BaseAdapter {
         }
         this.notifyDataSetChanged();
     }
+    */
 }

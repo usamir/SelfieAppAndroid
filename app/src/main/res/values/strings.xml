@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SelfieApp</string>
     <string name="camera">Camera</string>
+    <string name="selfie_image_desc_string">Selfie Image</string>
 </resources>
