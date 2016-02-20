@@ -1,26 +1,12 @@
 package com.samir.selfieapp;
 
-import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
-import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 

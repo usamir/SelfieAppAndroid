@@ -2,7 +2,6 @@ package com.samir.selfieapp;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,21 +48,19 @@ public class SelfieListAdapter extends BaseAdapter {
         }
 
         ImageView imgBitmap = (ImageView) convertView.findViewById(R.id.picture);
-        //TextView txtImage = (TextView) convertView.findViewById(R.id.textView);
         TextView txtDate = (TextView) convertView.findViewById(R.id.date);
 
         SelfieRecord selfie_pos = mList.get(position);
         //setting the image resource and title
         imgBitmap.setImageBitmap(selfie_pos.getPicture());
-        //txtImage.setText(selfie_pos.getmURI());
         txtDate.setText(selfie_pos.getDate());
 
         return convertView;
     }
 
 
-    public void add(SelfieRecord listItem) {
-        mList.add(listItem);
+    public void add(List<SelfieRecord> newList) {
+        mList.addAll(newList);
         notifyDataSetChanged();
     }
 
@@ -75,7 +70,7 @@ public class SelfieListAdapter extends BaseAdapter {
 
     /*
     public void removeAllViews() {
-        list.clear();
+        mList.clear();
         File storageDir = Environment
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         for (File f : storageDir.listFiles()) {
