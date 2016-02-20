@@ -5,6 +5,8 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,17 +18,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "Camera";
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Log.i(TAG, "Started main activity!");
 
+        // Support tollbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar (toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -43,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch(item.getItemId()) {
             case R.id.action_camera:
-                Intent intent = new Intent(this, CameraActivity.class);
+                Intent intent = new Intent(MainActivity.this, CameraActivity.class);
                 Log.e(TAG, "Starting activity ");
                 this.startActivity(intent);
                 break;
@@ -53,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
 }
 
 

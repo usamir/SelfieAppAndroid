@@ -1,5 +1,6 @@
 package com.samir.selfieapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -11,29 +12,29 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by usamir on 14.2.2016.
  */
 public class SelfieListAdapter extends BaseAdapter {
 
-    private ArrayList<SelfieRecord> list = new ArrayList<SelfieRecord>();
-    private static LayoutInflater inflater = null;
+    private List<SelfieRecord> mList;
     private Context mContext;
 
-    public SelfieListAdapter(Context context) {
+    public SelfieListAdapter(Context context, List<SelfieRecord> list) {
         mContext = context;
-        inflater = LayoutInflater.from(mContext);
+        mList = list;
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return mList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return list.get(position);
+        return mList.get(position);
     }
 
     @Override
@@ -43,43 +44,33 @@ public class SelfieListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        View newView = convertView;
-        ViewHolder holder;
-
-        SelfieRecord curr = list.get(position);
-
-        if (null == convertView) {
-            holder = new ViewHolder();
-            newView = inflater.inflate(R.layout.content_main, null);
-            holder.picture = (ImageView) newView.findViewById(R.id.picture);
-            holder.date = (TextView) newView.findViewById(R.id.date);
-            newView.setTag(holder);
-
-        } else {
-            holder = (ViewHolder) newView.getTag();
+        if (convertView == null) {
+            LayoutInflater mInflater = (LayoutInflater) mContext
+                    .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            convertView = mInflater.inflate(R.layout.listitem, null);
         }
 
-        holder.picture.setImageBitmap(curr.getPicture());
-        holder.date.setText("Date: " + curr.getDate());
+        ImageView imgBitmap = (ImageView) convertView.findViewById(R.id.picture);
+        //TextView txtImage = (TextView) convertView.findViewById(R.id.textView);
+        TextView txtDate = (TextView) convertView.findViewById(R.id.date);
 
-        return newView;
+        SelfieRecord selfie_pos = mList.get(position);
+        //setting the image resource and title
+        imgBitmap.setImageBitmap(selfie_pos.getPicture());
+        //txtImage.setText(selfie_pos.getmURI());
+        txtDate.setText(selfie_pos.getDate());
+
+        return convertView;
     }
 
-    static class ViewHolder {
-
-        ImageView picture;
-        TextView date;
-
-    }
 
     public void add(SelfieRecord listItem) {
-        list.add(listItem);
+        mList.add(listItem);
         notifyDataSetChanged();
     }
 
-    public ArrayList<SelfieRecord> getList() {
-        return list;
+    public List<SelfieRecord> getList() {
+        return mList;
     }
 
     /*

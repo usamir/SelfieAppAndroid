@@ -25,7 +25,7 @@ import java.util.List;
 
 public class CameraActivity extends Activity {
     private static final int PREVIEW_PAUSE = 2000;
-    private static final String TAG = "SelfieApp";
+    private static final String TAG = "CameraActivity";
     public static final int MEDIA_TYPE_IMAGE = 1;
 
     private Camera mCamera;
