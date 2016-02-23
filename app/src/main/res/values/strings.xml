@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SelfieApp</string>
-    <string name="camera">Camera</string>
+    <string name="camera">Camera Activity</string>
     <string name="selfie_image_desc_string">Selfie Image</string>
+    <string name="cancel_alarm">Cancel Alarm</string>
+    <string name="start_alarm">Start Alarm</string>
 </resources>

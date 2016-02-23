@@ -27,7 +27,12 @@
         <activity
             android:name=".CameraActivity"
             android:label="@string/app_name" />
-        <activity android:name=".SelfieDetailActivity"></activity>
+        <activity android:name=".SelfieDetailActivity" />
+
+        <receiver
+            android:name=".SelfieNotificationReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

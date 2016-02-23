@@ -2,6 +2,7 @@ package com.samir.selfieapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -68,11 +70,11 @@ public class SelfieListAdapter extends BaseAdapter {
         return mList;
     }
 
-    /*
+
     public void removeAllViews() {
         mList.clear();
-        File storageDir = Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory (
+                Environment.DIRECTORY_PICTURES), "SelfieApp");
         for (File f : storageDir.listFiles()) {
             if (f.isFile()) {
                 f.delete();
@@ -80,5 +82,5 @@ public class SelfieListAdapter extends BaseAdapter {
         }
         this.notifyDataSetChanged();
     }
-    */
+
 }

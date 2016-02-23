@@ -1,16 +1,24 @@
 package com.samir.selfieapp;
 
+import android.app.AlarmManager;
 import android.app.ListFragment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RemoteViews;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,14 +26,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class SelfieListFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class SelfieListFragment extends ListFragment {
 
     private static final String TAG = "SelfieListFragment";
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int NOTIFICATION_ID = 11151990;
 
     private SelfieListAdapter mAdapter;
     private List<SelfieRecord> selfieRecords;
     private Date mLatestPic = new Date(0,0,0);
+
+    private static PendingIntent mNotificationReceiverPendingIntent;
+    private static Intent mNotificationReceiverIntent;
+
+    private static final long INITIAL_ALARM_DELAY = 1 * 60 * 1000;
+    private static final long REPEAT_ALARM_DELAY = 1 * 60 * 1000;
+
+    private static Context mContext;
 
     @Override
     public void onResume() {
@@ -68,13 +85,19 @@ public class SelfieListFragment extends ListFragment implements AdapterView.OnIt
                              Bundle savedInstanceState) {
 
         Log.i(TAG, "View is created!");
+
         return inflater.inflate(R.layout.activity_selfie_list_fragment, null, false);
+
+
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
         super.onActivityCreated(savedInstanceState);
+
+        mContext = getActivity().getApplicationContext();
+
         Log.i(TAG, "Set up array of selfies");
         selfieRecords = new ArrayList<SelfieRecord>();
 
@@ -101,20 +124,18 @@ public class SelfieListFragment extends ListFragment implements AdapterView.OnIt
 
         Log.i(TAG, "Setting up Adapter");
         setListAdapter(mAdapter);
+
+        // Set up Alarm
+        setupAlarm();
+
     }
 
+    /** Showing details of clicked selfie */
     private void showDetail(String imageUri) {
         Intent intent;
-        intent = new Intent(getActivity().getApplicationContext(), SelfieDetailActivity.class);
+        intent = new Intent(mContext, SelfieDetailActivity.class);
         intent.setData(Uri.parse(imageUri));
         startActivity(intent);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(TAG, "Item is clicked!!");
-        SelfieRecord selfie = (SelfieRecord) mAdapter.getItem(position);
-        showDetail(selfie.getmURI());
     }
 
     @Override
@@ -125,4 +146,37 @@ public class SelfieListFragment extends ListFragment implements AdapterView.OnIt
         SelfieRecord selfie = (SelfieRecord) mAdapter.getItem(position);
         showDetail(selfie.getmURI());
     }
+
+    private static void setupNotificationIntent() {
+        mNotificationReceiverIntent = new Intent(mContext, SelfieNotificationReceiver.class);
+        Log.i(TAG, "Intent is created");
+        mNotificationReceiverPendingIntent = PendingIntent.getBroadcast(mContext, 0,
+                mNotificationReceiverIntent, 0);
+        Log.i(TAG, "Pending intent is created");
+    }
+
+    static public void setupAlarm() {
+
+        // set up notification receiver intent
+        setupNotificationIntent();
+
+        Log.i(TAG, "Setting up Alarm");
+        AlarmManager alarmManager =
+                (AlarmManager) mContext
+                        .getSystemService(mContext.ALARM_SERVICE);
+        Log.i(TAG, "Set up repeating alarm");
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + INITIAL_ALARM_DELAY,
+                REPEAT_ALARM_DELAY, mNotificationReceiverPendingIntent);
+    }
+
+    public static void cancelAlarm() {
+        if (null == mNotificationReceiverPendingIntent)
+            return;
+        AlarmManager alarmManager =
+                (AlarmManager) mContext
+                        .getSystemService(mContext.ALARM_SERVICE);
+        alarmManager.cancel(mNotificationReceiverPendingIntent);
+    }
+
 }

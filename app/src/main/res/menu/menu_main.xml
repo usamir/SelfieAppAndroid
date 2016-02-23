@@ -2,8 +2,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.samir.selfieapp.MainActivity" >
+
+    <item
+        android:id="@+id/cancel_alarm"
+        android:orderInCategory="99"
+        app:showAsAction="never"
+        android:title="@string/cancel_alarm"/>
+
+    <item
+        android:id="@+id/start_alarm"
+        android:orderInCategory="98"
+        app:showAsAction="never"
+        android:title="@string/start_alarm"/>
+
     <item android:id="@+id/action_camera"
         android:title="@string/camera"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_camera_alt_black_24dp"
+        app:showAsAction="ifRoom" />
 </menu>
