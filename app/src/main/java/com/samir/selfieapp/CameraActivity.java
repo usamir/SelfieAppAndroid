@@ -86,7 +86,7 @@ public class CameraActivity extends Activity {
                 // available.
                 // May take a long time to complete
                 // Consider moving this to an AsyncTask
-                mCamera = Camera.open();
+                mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
             } catch (RuntimeException e) {
                 Log.e(TAG, "Failed to acquire camera");
@@ -254,6 +254,7 @@ public class CameraActivity extends Activity {
 
             // Initialize preview display
             try {
+                mCamera.setDisplayOrientation(90);
                 mCamera.setPreviewDisplay(holder);
             } catch (IOException e) {
                 Log.e(TAG, "Failed to set preview display in ");

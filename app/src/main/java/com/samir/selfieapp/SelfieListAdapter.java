@@ -83,4 +83,14 @@ public class SelfieListAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    // TODO: remove only one picture from list of selfies
+    public void removeView(int id, String uri) {
+        mList.remove(id);
+        File f = new File(uri);
+        if (f.isFile()) {
+            f.delete();
+        }
+        this.notifyDataSetChanged();
+    }
+
 }

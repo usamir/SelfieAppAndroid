@@ -61,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,
                         "Your alarm is set up", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.delete_pics:
+                SelfieListFragment.removeSelfies();
+                Toast.makeText(MainActivity.this,
+                        "Removing selfies", Toast.LENGTH_SHORT).show();
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }

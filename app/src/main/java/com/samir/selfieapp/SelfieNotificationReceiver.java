@@ -43,7 +43,7 @@ public class SelfieNotificationReceiver extends BroadcastReceiver {
         Notification.Builder notificationBuilder = new Notification.Builder(
                 context).setTicker("It is Selfie Time!!!")
                 .setSmallIcon(R.mipmap.ic_launcher).setAutoCancel(true)
-                .setContentTitle("Time to take a selfie!")
+                .setContentTitle("Time for another selfie")
                 .setContentText("open up SelfieApp")
                 .setContentIntent(contentIntent).setSound(alarmSound);
 

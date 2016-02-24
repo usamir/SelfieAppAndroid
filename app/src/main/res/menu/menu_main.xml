@@ -4,6 +4,12 @@
     tools:context="com.samir.selfieapp.MainActivity" >
 
     <item
+        android:id="@+id/delete_pics"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="@string/delete_pics"/>
+
+    <item
         android:id="@+id/cancel_alarm"
         android:orderInCategory="99"
         app:showAsAction="never"

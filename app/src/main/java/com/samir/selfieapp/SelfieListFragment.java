@@ -2,10 +2,7 @@ package com.samir.selfieapp;
 
 import android.app.AlarmManager;
 import android.app.ListFragment;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RemoteViews;
+
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -29,18 +26,14 @@ import java.util.List;
 public class SelfieListFragment extends ListFragment {
 
     private static final String TAG = "SelfieListFragment";
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int NOTIFICATION_ID = 11151990;
 
-    private SelfieListAdapter mAdapter;
-    private List<SelfieRecord> selfieRecords;
+    private static SelfieListAdapter mAdapter;
     private Date mLatestPic = new Date(0,0,0);
 
     private static PendingIntent mNotificationReceiverPendingIntent;
-    private static Intent mNotificationReceiverIntent;
 
-    private static final long INITIAL_ALARM_DELAY = 1 * 60 * 1000;
-    private static final long REPEAT_ALARM_DELAY = 1 * 60 * 1000;
+    private static final long INITIAL_ALARM_DELAY = 24 * 60 * 60 * 1000;
+    private static final long REPEAT_ALARM_DELAY = 24 * 60 * 60 * 1000;
 
     private static Context mContext;
 
@@ -99,13 +92,22 @@ public class SelfieListFragment extends ListFragment {
         mContext = getActivity().getApplicationContext();
 
         Log.i(TAG, "Set up array of selfies");
-        selfieRecords = new ArrayList<SelfieRecord>();
+        List<SelfieRecord> selfieRecords = new ArrayList<SelfieRecord>();
 
         // Iterate throught the directory where this App have stored pics
         // and add those pictures and time stamps to Selfie record
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory (
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory (
                 Environment.DIRECTORY_PICTURES), "SelfieApp");
-        for (File f : storageDir.listFiles()) {
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d(TAG, "failed to create directory");
+            }
+        }
+        for (File f : mediaStorageDir.listFiles()) {
             if (f.isFile()) {
                 Log.i(TAG, f.getAbsolutePath());
                 Date lastModDate = new Date(f.lastModified());
@@ -128,6 +130,16 @@ public class SelfieListFragment extends ListFragment {
         // Set up Alarm
         setupAlarm();
 
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "On long list item is clicked!!");
+                SelfieRecord selfie = (SelfieRecord) mAdapter.getItem(position);
+
+                mAdapter.removeView(position, selfie.getmURI());
+                return true;
+            }
+        });
     }
 
     /** Showing details of clicked selfie */
@@ -147,8 +159,9 @@ public class SelfieListFragment extends ListFragment {
         showDetail(selfie.getmURI());
     }
 
+
     private static void setupNotificationIntent() {
-        mNotificationReceiverIntent = new Intent(mContext, SelfieNotificationReceiver.class);
+        Intent mNotificationReceiverIntent = new Intent(mContext, SelfieNotificationReceiver.class);
         Log.i(TAG, "Intent is created");
         mNotificationReceiverPendingIntent = PendingIntent.getBroadcast(mContext, 0,
                 mNotificationReceiverIntent, 0);
@@ -179,4 +192,7 @@ public class SelfieListFragment extends ListFragment {
         alarmManager.cancel(mNotificationReceiverPendingIntent);
     }
 
+    public static void removeSelfies () {
+        mAdapter.removeAllViews();
+    }
 }
