@@ -2,6 +2,9 @@ package com.samir.selfieapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Environment;
@@ -13,6 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -43,7 +47,7 @@ public class CameraActivity extends Activity {
         // Disable touches on mFrame
         mFrame.setEnabled(false);
 
-        // Recieve intent
+        // Receive intent
         Intent intent = getIntent();
 
         // Setup touch listener for taking pictures
@@ -82,7 +86,7 @@ public class CameraActivity extends Activity {
         if (null == mCamera) {
             try {
 
-                // Returns first back-facing camera or null if no camera is
+                // Returns first front-facing camera or null if no camera is
                 // available.
                 // May take a long time to complete
                 // Consider moving this to an AsyncTask
@@ -205,9 +209,21 @@ public class CameraActivity extends Activity {
             }
 
             try {
+                byte[] pictureBytes;
+                Bitmap thePicture = BitmapFactory.decodeByteArray(data, 0, data.length);
+                Matrix m = new Matrix();
+                m.postRotate(90);
+                thePicture = Bitmap.createBitmap(thePicture, 0, 0, thePicture.getWidth(), thePicture.getHeight(), m, true);
+
+                ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+                thePicture.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                pictureBytes = bos.toByteArray();
+
                 FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close ();
+                Log.i (TAG, pictureFile.getAbsolutePath ());
+                fos.write (pictureBytes);
+                fos.close();
+
             } catch (FileNotFoundException e) {
                 Log.d(TAG, "File not found: " + e.getMessage());
             } catch (IOException e) {
