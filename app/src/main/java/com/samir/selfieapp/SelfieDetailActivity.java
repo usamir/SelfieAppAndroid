@@ -17,7 +17,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class SelfieDetailActivity extends AppCompatActivity {
@@ -106,6 +108,32 @@ public class SelfieDetailActivity extends AppCompatActivity {
 
     //TODO: rotate picture
     private void rotate () {
+        try {
+            byte[] pictureBytes;
+            File pictureFile = new File(imageUri.toString());
+            Bitmap bitmap = BitmapFactory.decodeFile(imageUri.toString());
+
+            Matrix m = new Matrix();
+            m.postRotate(90);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            pictureBytes = bos.toByteArray();
+
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            Log.i (TAG, pictureFile.getAbsolutePath ());
+            fos.write (pictureBytes);
+            fos.close();
+
+            mImageView.setImageBitmap(bitmap);
+
+        } catch (FileNotFoundException e) {
+            Log.i(TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.i(TAG, "Error accessing file: " + e.getMessage());
+        }
 
     }
+
 }

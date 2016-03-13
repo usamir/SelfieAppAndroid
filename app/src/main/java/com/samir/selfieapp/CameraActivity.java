@@ -211,6 +211,7 @@ public class CameraActivity extends Activity {
             try {
                 byte[] pictureBytes;
                 Bitmap thePicture = BitmapFactory.decodeByteArray(data, 0, data.length);
+
                 Matrix m = new Matrix();
                 m.postRotate(270);
                 thePicture = Bitmap.createBitmap(thePicture, 0, 0, thePicture.getWidth(), thePicture.getHeight(), m, true);
