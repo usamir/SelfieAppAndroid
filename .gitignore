@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 local.properties
 *.xml
 *.bin
-.gradle/2.8/taskArtifacts/cache.properties.lock
+.idea
+.gradle
+mylibrary
+build
+>>>>>>> origin/master
