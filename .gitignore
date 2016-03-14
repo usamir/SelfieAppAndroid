@@ -1,0 +1,4 @@
+local.properties
+*.xml
+*.bin
+.gradle/2.8/taskArtifacts/cache.properties.lock
