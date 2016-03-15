@@ -60,7 +60,7 @@ public class SelfieListFragment extends ListFragment {
                 Log.i(TAG, f.getAbsolutePath());
                 String timeStamp = new SimpleDateFormat("yyyy-MM-d_HH:mm")
                         .format(lastModDate);
-                String date = f.toString().substring(f.toString().lastIndexOf("/") + 1);
+                String date = f.toString().substring (f.toString ().lastIndexOf ("/") + 1);
                 Log.i(TAG, timeStamp);
                 Log.i(TAG, "Date " + date);
                 SelfieRecord selfie = new SelfieRecord(f.getAbsolutePath(), date);
@@ -115,7 +115,9 @@ public class SelfieListFragment extends ListFragment {
                 String timeStamp = new SimpleDateFormat("yyyy-MM-d_HH:mm")
                         .format(lastModDate);
                 Log.i(TAG, timeStamp);
-                selfieRecords.add(new SelfieRecord(f.getAbsolutePath(), timeStamp));
+                String date = f.toString().substring (f.toString ().lastIndexOf ("/") + 1);
+                Log.i(TAG, "Date " + date);
+                selfieRecords.add(new SelfieRecord(f.getAbsolutePath(), date));
             }
         }
 

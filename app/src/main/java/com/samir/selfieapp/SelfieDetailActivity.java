@@ -10,11 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.ScrollView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,33 +31,70 @@ public class SelfieDetailActivity extends AppCompatActivity {
 
     private Bitmap mBitmap;
     private ImageView mImageView;
-    private Uri imageUri;
+    private Uri mImageUri;
+    private File mTempFile;
+
+    private float mScale = 1f;
+    private ScaleGestureDetector mScaleDetector;
+    GestureDetector mGestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_selfie_detail);
-        Log.i(TAG, "Created activity");
-        imageUri = getIntent().getData();
-        Log.i(TAG, imageUri.toString());
-        if (imageUri != null) {
+        super.onCreate (savedInstanceState);
+        setContentView (R.layout.activity_selfie_detail);
+        Log.i (TAG, "Created activity");
+
+        // location of image
+        mImageUri = getIntent().getData();
+        Log.i (TAG, mImageUri.toString ());
+
+        if (mImageUri != null) {
             mImageView = (ImageView) findViewById(R.id.detailedImage);
             try {
                 // Try to decode file to bitmap
-                mBitmap = BitmapFactory.decodeFile(imageUri.toString());
+                mBitmap = BitmapFactory.decodeFile(mImageUri.toString());
                 // if picture is to big than resize it
             } catch (OutOfMemoryError er) {
                 try {
                     BitmapFactory.Options options;
                     options = new BitmapFactory.Options();
                     options.inSampleSize = 2;
-                    mBitmap = BitmapFactory.decodeFile(imageUri.toString(), options);
+                    mBitmap = BitmapFactory.decodeFile(mImageUri.toString(), options);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage());
                 }
             }
+
             mImageView.setImageBitmap(mBitmap);
             Log.i(TAG, "Set Image");
+
+            // instance of gesture detector
+            mGestureDetector = new GestureDetector(this, new GestureListener());
+
+            // animation for scalling
+            mScaleDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener()
+            {
+                @Override
+                public boolean onScale(ScaleGestureDetector detector)
+                {
+                    float scale = 1 - detector.getScaleFactor();
+
+                    float prevScale = mScale;
+                    mScale += scale;
+
+                    if (mScale < 0.1f) // Minimum scale condition:
+                        mScale = 0.1f;
+
+                    if (mScale > 10f) // Maximum scale condition:
+                        mScale = 10f;
+                    ScaleAnimation scaleAnimation = new ScaleAnimation (1f / prevScale, 1f / mScale, 1f / prevScale, 1f / mScale, detector.getFocusX(), detector.getFocusY());
+                    scaleAnimation.setDuration(0);
+                    scaleAnimation.setFillAfter(true);
+                    ScrollView layout =(ScrollView) findViewById(R.id.scrollView);
+                    layout.startAnimation(scaleAnimation);
+                    return true;
+                }
+            });
         }
 
 
@@ -62,6 +102,14 @@ public class SelfieDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
 
+    }
+
+    @Override
+    public boolean dispatchTouchEvent (MotionEvent ev) {
+        super.dispatchTouchEvent (ev);
+        mScaleDetector.onTouchEvent(ev);
+        mGestureDetector.onTouchEvent(ev);
+        return mGestureDetector.onTouchEvent (ev);
     }
 
     @Override
@@ -93,7 +141,7 @@ public class SelfieDetailActivity extends AppCompatActivity {
     //TODO: share picture on social pages
     private void sharePic () {
 
-        Bitmap bitmap = BitmapFactory.decodeFile(imageUri.toString());
+        Bitmap bitmap = BitmapFactory.decodeFile (mImageUri.toString ());
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("image/jpeg");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -110,8 +158,9 @@ public class SelfieDetailActivity extends AppCompatActivity {
     private void rotate () {
         try {
             byte[] pictureBytes;
-            File pictureFile = new File(imageUri.toString());
-            Bitmap bitmap = BitmapFactory.decodeFile(imageUri.toString());
+            String imgPath = mImageUri.toString ();
+            mTempFile = new File("tmp_" + imgPath);
+            Bitmap bitmap = BitmapFactory.decodeFile (imgPath);
 
             Matrix m = new Matrix();
             m.postRotate(90);
@@ -121,8 +170,8 @@ public class SelfieDetailActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             pictureBytes = bos.toByteArray();
 
-            FileOutputStream fos = new FileOutputStream(pictureFile);
-            Log.i (TAG, pictureFile.getAbsolutePath ());
+            FileOutputStream fos = new FileOutputStream(mTempFile);
+            Log.i (TAG, mTempFile.getAbsolutePath ());
             fos.write (pictureBytes);
             fos.close();
 
@@ -136,4 +185,28 @@ public class SelfieDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy () {
+        super.onDestroy ();
+
+        Log.i (TAG, "Destroying file " + mTempFile.toString ());
+        if (mTempFile.isFile ()) {
+            mTempFile.delete ();
+        }
+    }
+
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+        // event when double tap occurs
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            // double tap fired.
+            Log.i (TAG, "Double tap!");
+            return true;
+        }
+    }
 }

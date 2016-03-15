@@ -1,9 +1,10 @@
 <<<<<<< HEAD
 local.properties
-*.xml
 *.bin
 .idea
 .gradle
 mylibrary
 build
+gen
+gradle
 >>>>>>> origin/master
