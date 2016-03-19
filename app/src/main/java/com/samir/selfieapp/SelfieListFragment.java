@@ -60,10 +60,10 @@ public class SelfieListFragment extends ListFragment {
                 Log.i(TAG, f.getAbsolutePath());
                 String timeStamp = new SimpleDateFormat("yyyy-MM-d_HH:mm")
                         .format(lastModDate);
-                String date = f.toString().substring (f.toString ().lastIndexOf ("/") + 1);
+
                 Log.i(TAG, timeStamp);
-                Log.i(TAG, "Date " + date);
-                SelfieRecord selfie = new SelfieRecord(f.getAbsolutePath(), date);
+                SelfieRecord selfie = new SelfieRecord(f.getAbsolutePath(), timeStamp);
+
                 Log.i(TAG, "Add new one!");
                 selfieList.add(selfie);
 
@@ -76,12 +76,8 @@ public class SelfieListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         Log.i(TAG, "View is created!");
-
         return inflater.inflate(R.layout.activity_selfie_list_fragment, null, false);
-
-
     }
 
     @Override
@@ -115,9 +111,7 @@ public class SelfieListFragment extends ListFragment {
                 String timeStamp = new SimpleDateFormat("yyyy-MM-d_HH:mm")
                         .format(lastModDate);
                 Log.i(TAG, timeStamp);
-                String date = f.toString().substring (f.toString ().lastIndexOf ("/") + 1);
-                Log.i(TAG, "Date " + date);
-                selfieRecords.add(new SelfieRecord(f.getAbsolutePath(), date));
+                selfieRecords.add(new SelfieRecord(f.getAbsolutePath(), timeStamp));
             }
         }
 
@@ -128,9 +122,6 @@ public class SelfieListFragment extends ListFragment {
 
         Log.i(TAG, "Setting up Adapter");
         setListAdapter(mAdapter);
-
-        // Set up Alarm
-        setupAlarm();
 
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

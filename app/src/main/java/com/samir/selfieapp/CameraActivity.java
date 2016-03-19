@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -85,12 +86,18 @@ public class CameraActivity extends Activity {
 
         if (null == mCamera) {
             try {
-
-                // Returns first front-facing camera or null if no camera is
-                // available.
-                // May take a long time to complete
-                // Consider moving this to an AsyncTask
-                mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                if (Camera.getNumberOfCameras() >= 2) {
+                    // Returns first front-facing camera or null if no camera is
+                    // available.
+                    // May take a long time to complete
+                    // Consider moving this to an AsyncTask
+                    mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                } else if (Camera.getNumberOfCameras() == 1) {
+                    mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+                } else {
+                    Toast.makeText(CameraActivity.this,
+                            "This device does not have camera!", Toast.LENGTH_LONG).show();
+                }
 
             } catch (RuntimeException e) {
                 Log.e(TAG, "Failed to acquire camera");

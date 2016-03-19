@@ -34,83 +34,35 @@ public class SelfieDetailActivity extends AppCompatActivity {
     private Uri mImageUri;
     private File mTempFile;
 
-    private float mScale = 1f;
-    private ScaleGestureDetector mScaleDetector;
-    GestureDetector mGestureDetector;
+    // are we currently rotating image
+    boolean mInRotation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_selfie_detail);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_selfie_detail);
         Log.i (TAG, "Created activity");
 
         // location of image
         mImageUri = getIntent().getData();
-        Log.i (TAG, mImageUri.toString ());
+        Log.i(TAG, mImageUri.toString());
 
         if (mImageUri != null) {
             mImageView = (ImageView) findViewById(R.id.detailedImage);
-            try {
-                // Try to decode file to bitmap
-                mBitmap = BitmapFactory.decodeFile(mImageUri.toString());
-                // if picture is to big than resize it
-            } catch (OutOfMemoryError er) {
-                try {
-                    BitmapFactory.Options options;
-                    options = new BitmapFactory.Options();
-                    options.inSampleSize = 2;
-                    mBitmap = BitmapFactory.decodeFile(mImageUri.toString(), options);
-                } catch (Exception e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            }
+            mBitmap = decodingFile(mImageUri.toString());
 
             mImageView.setImageBitmap(mBitmap);
             Log.i(TAG, "Set Image");
-
-            // instance of gesture detector
-            mGestureDetector = new GestureDetector(this, new GestureListener());
-
-            // animation for scalling
-            mScaleDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener()
-            {
-                @Override
-                public boolean onScale(ScaleGestureDetector detector)
-                {
-                    float scale = 1 - detector.getScaleFactor();
-
-                    float prevScale = mScale;
-                    mScale += scale;
-
-                    if (mScale < 0.1f) // Minimum scale condition:
-                        mScale = 0.1f;
-
-                    if (mScale > 10f) // Maximum scale condition:
-                        mScale = 10f;
-                    ScaleAnimation scaleAnimation = new ScaleAnimation (1f / prevScale, 1f / mScale, 1f / prevScale, 1f / mScale, detector.getFocusX(), detector.getFocusY());
-                    scaleAnimation.setDuration(0);
-                    scaleAnimation.setFillAfter(true);
-                    ScrollView layout =(ScrollView) findViewById(R.id.scrollView);
-                    layout.startAnimation(scaleAnimation);
-                    return true;
-                }
-            });
         }
-
 
         // Support tollbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
 
+        // during creation we are not rotating image
+        mInRotation = false;
     }
 
-    @Override
-    public boolean dispatchTouchEvent (MotionEvent ev) {
-        super.dispatchTouchEvent (ev);
-        mScaleDetector.onTouchEvent(ev);
-        mGestureDetector.onTouchEvent(ev);
-        return mGestureDetector.onTouchEvent (ev);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -138,16 +90,18 @@ public class SelfieDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    //TODO: share picture on social pages
+    // share picture on social pages
     private void sharePic () {
 
-        Bitmap bitmap = BitmapFactory.decodeFile (mImageUri.toString ());
+        mBitmap = decodingFile(mImageUri.toString());
+
+        // action for sharing picture
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("image/jpeg");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(getContentResolver(),
-                bitmap, "Title", null);
+                mBitmap, "Title", null);
         Uri imageUri =  Uri.parse(path);
         share.putExtra(Intent.EXTRA_STREAM, imageUri);
         startActivity(Intent.createChooser(share, "Select"));
@@ -159,15 +113,22 @@ public class SelfieDetailActivity extends AppCompatActivity {
         try {
             byte[] pictureBytes;
             String imgPath = mImageUri.toString ();
-            mTempFile = new File("tmp_" + imgPath);
-            Bitmap bitmap = BitmapFactory.decodeFile (imgPath);
+            String tempImgPath = mImageUri.toString () + ".tmp";
+
+            mTempFile = new File(tempImgPath);
+            if (!mInRotation) {
+                mBitmap = decodingFile(imgPath);
+                mInRotation = true;
+            } else {
+                mBitmap = decodingFile(tempImgPath);
+            }
 
             Matrix m = new Matrix();
             m.postRotate(90);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+            mBitmap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(), mBitmap.getHeight(), m, true);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream ();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             pictureBytes = bos.toByteArray();
 
             FileOutputStream fos = new FileOutputStream(mTempFile);
@@ -175,7 +136,7 @@ public class SelfieDetailActivity extends AppCompatActivity {
             fos.write (pictureBytes);
             fos.close();
 
-            mImageView.setImageBitmap(bitmap);
+            mImageView.setImageBitmap(mBitmap);
 
         } catch (FileNotFoundException e) {
             Log.i(TAG, "File not found: " + e.getMessage());
@@ -185,28 +146,38 @@ public class SelfieDetailActivity extends AppCompatActivity {
 
     }
 
+    private Bitmap decodingFile (String imgPath) {
+        try {
+            // Try to decode file to bitmap
+            return BitmapFactory.decodeFile(imgPath);
+            // if picture is to big than resize it
+        } catch (OutOfMemoryError er) {
+            try {
+                BitmapFactory.Options options;
+                options = new BitmapFactory.Options();
+                options.inSampleSize = 2;
+                return BitmapFactory.decodeFile(imgPath, options);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+
+        // if it comes here then return null
+        return  null;
+    }
+
     @Override
-    protected void onDestroy () {
-        super.onDestroy ();
+    protected void onPause () {
+        super.onPause ();
 
         Log.i (TAG, "Destroying file " + mTempFile.toString ());
         if (mTempFile.isFile ()) {
             mTempFile.delete ();
         }
+
+        Log.i(TAG, "Recycle bitmap");
+        mBitmap.recycle();
+        mBitmap = null;
     }
 
-
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-        // event when double tap occurs
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            // double tap fired.
-            Log.i (TAG, "Double tap!");
-            return true;
-        }
-    }
 }
