@@ -63,6 +63,25 @@ public class SelfieDetailActivity extends AppCompatActivity {
         mInRotation = false;
     }
 
+   /* @Override
+    protected void onResume() {
+        super.onResume();
+
+        // location of image
+        mImageUri = getIntent().getData();
+        Log.i(TAG, mImageUri.toString());
+
+        if (mImageUri != null) {
+            mImageView = (ImageView) findViewById(R.id.detailedImage);
+            mBitmap = decodingFile(mImageUri.toString());
+
+            mImageView.setImageBitmap(mBitmap);
+            Log.i(TAG, "Set Image");
+        }
+
+        // during creation we are not rotating image
+        mInRotation = false;
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -165,19 +184,45 @@ public class SelfieDetailActivity extends AppCompatActivity {
         // if it comes here then return null
         return  null;
     }
-
+/*
     @Override
     protected void onPause () {
-        super.onPause ();
+        super.onPause();
 
-        Log.i (TAG, "Destroying file " + mTempFile.toString ());
-        if (mTempFile.isFile ()) {
-            mTempFile.delete ();
+        // check for null pointer, we did not made changes to image
+        if (mTempFile != null) {
+            if (mTempFile.isFile ()) {
+                Log.i (TAG, "Destroying file " + mTempFile.toString ());
+                mTempFile.delete ();
+            }
         }
 
-        Log.i(TAG, "Recycle bitmap");
-        mBitmap.recycle();
-        mBitmap = null;
-    }
+        // check for null pointer for bitmap, we did not load bitmap
+        if (mBitmap != null) {
+            Log.i(TAG, "Recycle bitmap");
+            mBitmap.recycle();
+            mBitmap = null;
+        }
 
+    }*/
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // check for null pointer, we did not made changes to image
+        if (mTempFile != null) {
+            if (mTempFile.isFile ()) {
+                Log.i (TAG, "Destroying file " + mTempFile.toString ());
+                mTempFile.delete ();
+            }
+        }
+
+        // check for null pointer for bitmap, we did not load bitmap
+        if (mBitmap != null) {
+            Log.i(TAG, "Recycle bitmap");
+            mBitmap.recycle();
+            mBitmap = null;
+        }
+    }
 }

@@ -70,6 +70,7 @@ public class SelfieListFragment extends ListFragment {
             }
         }
         mAdapter.add(selfieList);
+
     }
 
 
@@ -188,4 +189,5 @@ public class SelfieListFragment extends ListFragment {
     public static void removeSelfies () {
         mAdapter.removeAllViews();
     }
+
 }
