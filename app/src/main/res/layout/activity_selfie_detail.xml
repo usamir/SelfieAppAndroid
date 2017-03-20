@@ -31,6 +31,6 @@
             android:id="@+id/detailedImage"
             android:layout_gravity="center"/>
 
-        </ScrollView>
+    </ScrollView>
 
 </RelativeLayout>
